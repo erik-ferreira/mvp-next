@@ -1,4 +1,11 @@
+import { GetServerSideProps } from "next";
+import { getSession, signIn } from "next-auth/react";
+
 export default function Home() {
+  function handleSignIn() {
+    signIn("github");
+  }
+
   return (
     <div className="h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
@@ -82,10 +89,11 @@ export default function Home() {
 
           <div>
             <button
-              type="submit"
+              type="button"
               className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              onClick={handleSignIn}
             >
-              Sign in
+              Sign in with Github
             </button>
           </div>
         </form>
@@ -93,3 +101,20 @@ export default function Home() {
     </div>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const session = await getSession({ req });
+
+  if (session) {
+    return {
+      redirect: {
+        destination: "/app",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {},
+  };
+};
